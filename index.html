@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Holiday Weather Matrix</title>
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%);
+            --surface: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --accent: #059669;
+            --high-temp-bg: #fef3c7;
+            --high-temp-text: #b45309;
+            --low-temp-bg: #ccfbf1;
+            --low-temp-text: #0f766e;
+            --precip-bg: #e0f2fe;
+            --precip-text: #0369a1;
+            --border: #cbd5e1;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            color: var(--text-main);
+            margin: 0;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 950px;
+            margin: 2rem auto;
+            background: var(--surface);
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+        .title-area {
+            margin-top: 0;
+            font-size: 2.25rem;
+            font-weight: 800;
+            color: #065f46;
+            letter-spacing: -0.025em;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .selector-box {
+            margin-bottom: 3rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        label { 
+            font-weight: 700; 
+            color: var(--text-muted); 
+            font-size: 0.8rem; 
+            text-transform: uppercase; 
+            letter-spacing: 0.1em; 
+        }
+        select {
+            padding: 0.85rem 1.25rem;
+            font-size: 1.05rem;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            background: #ffffff;
+            color: var(--text-main);
+            cursor: pointer;
+            outline: none;
+            width: 100%;
+            max-width: 450px;
+            transition: all 0.2s ease;
+        }
+        select:focus { 
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.15);
+        }
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 6px;
+            text-align: left;
+            margin-top: 1rem;
+        }
+        th {
+            padding: 1rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        td {
+            padding: 1.1rem 1rem;
+            background: #f8fafc;
+            border-top: 1px solid #f1f5f9;
+            border-bottom: 1px solid #f1f5f9;
+            transition: all 0.2s ease;
+        }
+        td:first-child {
+            border-left: 1px solid #f1f5f9;
+            border-top-left-radius: 10px;
+            border-bottom-left-radius: 10px;
+            font-weight: 600;
+        }
+        td:last-child {
+            border-right: 1px solid #f1f5f9;
+            border-top-right-radius: 10px;
+            border-bottom-right-radius: 10px;
+        }
+        tr:hover td { 
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+        .temp-badge {
+            padding: 0.4rem 0.75rem;
+            border-radius: 6px;
+            font-weight: 700;
+            display: inline-block;
+            font-size: 0.9rem;
+        }
+        .temp-high {
+            background: var(--high-temp-bg);
+            color: var(--high-temp-text);
+            border: 1px solid rgba(180, 83, 9, 0.15);
+        }
+        .temp-low {
+            background: var(--low-temp-bg);
+            color: var(--low-temp-text);
+            border: 1px solid rgba(15, 118, 110, 0.15);
+        }
+        .precip-badge {
+            background: var(--precip-bg);
+            color: var(--precip-text);
+            border: 1px solid rgba(3, 105, 161, 0.15);
+            padding: 0.4rem 0.75rem;
+            border-radius: 6px;
+            font-weight: 600;
+            display: inline-block;
+            font-size: 0.9rem;
+        }
+        .no-data {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-muted);
+            font-style: italic;
+            background: transparent !important;
+            border: none !important;
+            font-size: 1.05rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1 class="title-area" id="mainHeader">🌤️ Holiday Weather Dashboard Matrix</h1>
+    
+    <div class="selector-box">
+        <label for="holidaySelect">Select Holiday</label>
+        <select id="holidaySelect" onchange="updateWeatherTable()">
+            <option value="">-- Choose an Observance --</option>
+            <option value="Christmas Day">🎄 Christmas Day</option><option value="Columbus Day">⛵ Columbus Day</option><option value="Easter Sunday">🥚 Easter Sunday</option><option value="Halloween">🎃 Halloween</option><option value="Independence Day">🎆 Independence Day</option><option value="Juneteenth">✊🏾 Juneteenth</option><option value="Labor Day">🛠️ Labor Day</option><option value="Martin Luther King Jr. Day">🕊️ Martin Luther King Jr. Day</option><option value="Memorial Day">🇺🇸 Memorial Day</option><option value="New Year's Day">🥂 New Year's Day</option><option value="New Year's Eve">🎉 New Year's Eve</option><option value="Presidents' Day">🦅 Presidents' Day</option><option value="Thanksgiving Day">🦃 Thanksgiving Day</option><option value="Veterans Day">🎖️ Veterans Day</option>
+        </select>
+    </div>
+
+    <table id="resultsTable">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>High Temp</th>
+                <th>Low Temp</th>
+                <th>Precipitation</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            <tr>
+                <td colspan="4" class="no-data">Select an observance from the menu above to unpack historical climate trends.</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+const weatherDatabase = {
+  "New Year's Day": [
+    {
+      "date": "2026-01-01",
+      "high": "36.9",
+      "low": "15.4",
+      "precip": "0.02"
+    },
+    {
+      "date": "2025-01-01",
+      "high": "51.1",
+      "low": "40.1",
+      "precip": "0.0"
+    },
+    {
+      "date": "2024-01-01",
+      "high": "47.7",
+      "low": "34.2",
+      "precip": "0.01"
+    },
+    {
+      "date": "2023-01-01",
+      "high": "55.9",
+      "low": "37.2",
+      "precip": "0.0"
+    },
+    {
+      "date": "2022-01-01",
+      "high": "53.8",
+      "low": "49.3",
+      "precip": "0.81"
+    },
+    {
+      "date": "2021-01-01",
+      "high": "40.5",
+      "low": "28.0",
+      "precip": "0.8"
+    },
+    {
+      "date": "2020-01-01",
+      "high": "N/A",
+      "low": "N/A",
+      "precip": "N/A"
+    }
+  ],
+  "Juneteenth": [
+    {
+      "date": "2026-06-19",
+      "high": "85.1",
+      "low": "70.3",
+      "precip": "0.0"
+    },
+    {
+      "date": "2025-06-19",
+      "high": "89.4",
+      "low": "68.2",
+      "precip": "0.29"
+    },
+    {
+      "date": "2024-06-19",
+      "high": "85.5",
+      "low": "66.7",
+      "precip": "0.0"
+    },
+    {
+      "date": "2023-06-19",
+      "high": "80.6",
+      "low": "62.6",
+      "precip": "0.0"
+    },
+    {
+      "date": "2022-06-19",
+      "high": "75.0",
+      "low": "53.1",
+      "precip": "0.0"
+    },
+    {
+      "date": "2021-06-19",
+      "high": "89.6",
+      "low": "64.2",
+      "precip": "0.05"
+    },
+    {
+      "date": "2020-06-19",
+      "high": "N/A",
+      "low": "N/A",
+      "precip": "N/A"
+    }
+  ],
+  "Independence Day": [
+    {
+      "date": "2026-07-04",
+      "high": "98.4",
+      "low": "75.6",
+      "precip": "0.12"
+    },
+    {
+      "date": "2025-07-04",
+      "high": "86.7",
+      "low": "63.9",
+      "precip": "0.0"
+    },
+    {
+      "date": "2024-07-04",
+      "high": "85.6",
+      "low": "66.4",
+      "precip": "0.03"
+    },
+    {
+      "date": "2023-07-04",
+      "high": "84.7",
+      "low": "71.6",
+      "precip": "0.11"
+    },
+    {
+      "date": "2022-07-04",
+      "high": "84.4",
+      "low": "58.6",
+      "precip": "0.0"
+    },
+    {
+      "date": "2021-07-04",
+      "high": "79.0",
+      "low": "57.7",
+      "precip": "0.0"
+    },
+    {
+      "date": "2020-07-04",
+      "high": "N/A",
+      "low": "N/A",
+      "precip": "N/A"
+    }
+  ],
+  "Halloween": [
+    {
+      "date": "2026-10-31",
+      "high": "N/A",
+      "low": "N/A",
+      "precip": "N/A"
+    },
+    {
+      "date": "2025-10-31",
+      "high": "57.9",
+      "low": "52.2",
+      "precip": "0.01"
+    },
+    {
+      "date": "2024-10-31",
+      "high": "80.4",
+      "low": "50.7",
+      "precip": "0.0"
+    },
+    {
+      "date": "2023-10-31",
+      "high": "54.5",
+      "low": "44.4",
+      "precip": "0.0"
+    },
+    {
+      "date": "2022-10-31",
+      "high": "69.4",
+      "low": "47.8",
+      "precip": "0.04"
+    },
+    {
+      "date": "2021-10-31",
+      "high": "67.1",
+      "low": "55.6",
+      "precip": "0.06"
+    },
+    {
+      "date": "2020-10-31",
+      "high": "N/A",
+      "low": "N/A",
+      "precip": "N/A"
+    }
+  ],
+  "Veterans Day": [
+    {
+      "date": "2026-11-11",
+      "high": "N/A",
+      "low": "N/A",
+      "precip": "N/A"
+    },
+    {
+      "date": "2025-11-11",
+      "high": "40.1",
+      "low": "32.1",
+      "precip": "0"
+    },
+    {
+      "date": "2024-11-11",
+      "high": "67.6",
+      "low": "47.3",
+      "precip": "0.13"
+    },
+    {
+      "date": "2023-11-11",
+      "high": "56.1",
+      "low": "36.1",
+      "precip": "0.0"
+    },
+    {
+      "date": "2022-11-11",
+      "high": "68.9",
+      "low": "50.7",
+      "precip": "1.19"
+    },
+    {
+      "date": "2021-11-11",
+      "high": "62.6",
+      "low": "33.8",
+      "precip": "0.0"
+    },
+    {
+      "date": "2020-11-11",
+      "high": "N/A",
+      "low": "N/A",
+      "precip": "N/A"
+    }
+  ],
+  "Christmas Day": [
+    {
+      "date": "2026-12-25",
+      "high": "N/A",
+      "low": "N/A",
+      "precip": "N/A"
+    },
+    {
+      "date": "2025-12-25",
+      "high": "49.1",
+      "low": "26.2",
+      "precip": "0.00"
+    },
+    {
+      "date": "2024-12-25",
+      "high": "36.3",
+      "low": "23.7",
+      "precip": "0.0"
+    },
+    {
+      "date": "2023-12-25",
+      "high": "50.9",
+      "low": "37.6",
+      "precip": "0.0"
+    },
+    {
+      "date": "2022-12-25",
+      "high": "28.0",
+      "low": "13.5",
+      "precip": "0.0"
+    },
+    {
+      "date": "2021-12-25",
+      "high": "N/A",
+      "low": "N/A",
+      "precip": "N/A"
+    },
+    {
+      "date": "2020-12-25",
+      "high": "59.5",
+      "low": "29.7",
+      "precip": "0.52"
+    }
+  ],
+  "New Year's Eve": [
+    {
+      "date": "2026-12-31",
+      "high": "N/A",
+      "low": "N/A",
+      "precip": "N/A"
+    },
+    {
+      "date": "2025-12-31",
+      "high": "33.6",
+      "low": "26.6",
+      "precip": "Precip"
+    },
+    {
+      "date": "2024-12-31",
+      "high": "54.5",
+      "low": "31.6",
+      "precip": "0.73"
+    },
+    {
+      "date": "2023-12-31",
+      "high": "42.3",
+      "low": "36.7",
+      "precip": "0.0"
+    },
+    {
+      "date": "2022-12-31",
+      "high": "52.7",
+      "low": "39.7",
+      "precip": "0.31"
+    },
+    {
+      "date": "2021-12-31",
+      "high": "53.6",
+      "low": "46.6",
+      "precip": "0.0"
+    },
+    {
+      "date": "2020-12-31",
+      "high": "47.5",
+      "low": "32.2",
+      "precip": "0.34"
+    }
+  ],
+  "Martin Luther King Jr. Day": [
+    {
+      "date": "2026-01-19",
+      "high": "33.0",
+      "low": "24.6",
+      "precip": "0.01"
+    },
+    {
+      "date": "2025-01-20",
+      "high": "28.0",
+      "low": "14.5",
+      "precip": "0.0"
+    },
+    {
+      "date": "2024-01-15",
+      "high": "28.6",
+      "low": "22.3",
+      "precip": "0.0"
+    },
+    {
+      "date": "2023-01-16",
+      "high": "44.4",
+      "low": "28.4",
+      "precip": "0.0"
+    },
+    {
+      "date": "2022-01-17",
+      "high": "45.7",
+      "low": "33.8",
+      "precip": "1.07"
+    },
+    {
+      "date": "2021-01-18",
+      "high": "46.9",
+      "low": "33.4",
+      "precip": "0.0"
+    },
+    {
+      "date": "2020-01-20",
+      "high": "N/A",
+      "low": "N/A",
+      "precip": "N/A"
+    }
+  ],
+  "Presidents' Day": [
+    {
+      "date": "2026-02-16",
+      "high": "41.0",
+      "low": "25.7",
+      "precip": "0.16"
+    },
+    {
+      "date": "2025-02-17",
+      "high": "36.0",
+      "low": "23.9",
+      "precip": "0.0"
+    },
+    {
+      "date": "2024-02-19",
+      "high": "41.0",
+      "low": "25.2",
+      "precip": "0.0"
+    },
+    {
+      "date": "2023-02-20",
+      "high": "62.4",
+      "low": "41.9",
+      "precip": "0.0"
+    },
+    {
+      "date": "2022-02-21",
+      "high": "56.1",
+      "low": "29.3",
+      "precip": "0.0"
+    },
+    {
+      "date": "2021-02-15",
+      "high": "36.0",
+      "low": "32.4",
+      "precip": "0.0"
+    },
+    {
+      "date": "2020-02-17",
+      "high": "N/A",
+      "low": "N/A",
+      "precip": "N/A"
+    }
+  ],
+  "Memorial Day": [
+    {
+      "date": "2026-05-25",
+      "high": "75.0",
+      "low": "55.0",
+      "precip": "0.15"
+    },
+    {
+      "date": "2025-05-26",
+      "high": "73.4",
+      "low": "49.5",
+      "precip": "0.0"
+    },
+    {
+      "date": "2024-05-27",
+      "high": "76.6",
+      "low": "65.3",
+      "precip": "1.02"
+    },
+    {
+      "date": "2023-05-29",
+      "high": "78.6",
+      "low": "53.6",
+      "precip": "0.0"
+    },
+    {
+      "date": "2022-05-30",
+      "high": "85.5",
+      "low": "56.7",
+      "precip": "0.0"
+    },
+    {
+      "date": "2021-05-31",
+      "high": "71.2",
+      "low": "48.2",
+      "precip": "0.0"
+    },
+    {
+      "date": "2020-05-25",
+      "high": "N/A",
+      "low": "N/A",
+      "precip": "N/A"
+    }
+  ],
+  "Labor Day": [
+    {
+      "date": "2026-09-07",
+      "high": "82.8",
+      "low": "53.6",
+      "precip": "0.0"
+    },
+    {
+      "date": "2025-09-01",
+      "high": "77.5",
+      "low": "56.8",
+      "precip": "0.0"
+    },
+    {
+      "date": "2024-09-02",
+      "high": "81.1",
+      "low": "64.0",
+      "precip": "0.0"
+    },
+    {
+      "date": "2023-09-04",
+      "high": "90.9",
+      "low": "66.7",
+      "precip": "0.0"
+    },
+    {
+      "date": "2022-09-05",
+      "high": "88.7",
+      "low": "70.5",
+      "precip": "0.0"
+    },
+    {
+      "date": "2021-09-06",
+      "high": "84.7",
+      "low": "64.8",
+      "precip": "0.0"
+    },
+    {
+      "date": "2020-09-07",
+      "high": "N/A",
+      "low": "N/A",
+      "precip": "N/A"
+    }
+  ],
+  "Columbus Day": [
+    {
+      "date": "2026-10-12",
+      "high": "N/A",
+      "low": "N/A",
+      "precip": "N/A"
+    },
+    {
+      "date": "2025-10-13",
+      "high": "59.9",
+      "low": "55.4",
+      "precip": "0.66"
+    },
+    {
+      "date": "2024-10-14",
+      "high": "68.5",
+      "low": "46.9",
+      "precip": "0.0"
+    },
+    {
+      "date": "2023-10-09",
+      "high": "63.0",
+      "low": "43.3",
+      "precip": "0.0"
+    },
+    {
+      "date": "2022-10-10",
+      "high": "70.3",
+      "low": "42.4",
+      "precip": "0.0"
+    },
+    {
+      "date": "2021-10-11",
+      "high": "75.4",
+      "low": "59.0",
+      "precip": "0.0"
+    },
+    {
+      "date": "2020-10-12",
+      "high": "N/A",
+      "low": "N/A",
+      "precip": "N/A"
+    }
+  ],
+  "Thanksgiving Day": [
+    {
+      "date": "2026-11-26",
+      "high": "N/A",
+      "low": "N/A",
+      "precip": "N/A"
+    },
+    {
+      "date": "2025-11-27",
+      "high": "47.1",
+      "low": "35.4",
+      "precip": "0.00"
+    },
+    {
+      "date": "2024-11-28",
+      "high": "53.4",
+      "low": "42.3",
+      "precip": "0.68"
+    },
+    {
+      "date": "2023-11-23",
+      "high": "52.2",
+      "low": "36.7",
+      "precip": "0.0"
+    },
+    {
+      "date": "2022-11-24",
+      "high": "58.8",
+      "low": "28.6",
+      "precip": "0.0"
+    },
+    {
+      "date": "2021-11-25",
+      "high": "57.0",
+      "low": "28.2",
+      "precip": "0.0"
+    },
+    {
+      "date": "2020-11-26",
+      "high": "N/A",
+      "low": "N/A",
+      "precip": "N/A"
+    }
+  ],
+  "Easter Sunday": [
+    {
+      "date": "2026-04-05",
+      "high": "55.9",
+      "low": "41.5",
+      "precip": "0.22"
+    },
+    {
+      "date": "2025-04-20",
+      "high": "70.5",
+      "low": "47.3",
+      "precip": "0.0"
+    },
+    {
+      "date": "2024-03-31",
+      "high": "61.9",
+      "low": "40.6",
+      "precip": "0.05"
+    },
+    {
+      "date": "2023-04-09",
+      "high": "55.9",
+      "low": "30.7",
+      "precip": "0.0"
+    },
+    {
+      "date": "2022-04-17",
+      "high": "50.9",
+      "low": "38.3",
+      "precip": "0.03"
+    },
+    {
+      "date": "2021-04-04",
+      "high": "63.1",
+      "low": "33.6",
+      "precip": "0.0"
+    },
+    {
+      "date": "2020-04-12",
+      "high": "N/A",
+      "low": "N/A",
+      "precip": "N/A"
+    }
+  ]
+};
+const holidayIcons = {
+  "New Year's Day": "\ud83e\udd42",
+  "Juneteenth": "\u270a\ud83c\udffe",
+  "Independence Day": "\ud83c\udf86",
+  "Halloween": "\ud83c\udf83",
+  "Veterans Day": "\ud83c\udf96\ufe0f",
+  "Christmas Day": "\ud83c\udf84",
+  "New Year's Eve": "\ud83c\udf89",
+  "Martin Luther King Jr. Day": "\ud83d\udd4a\ufe0f",
+  "Presidents' Day": "\ud83e\udd85",
+  "Memorial Day": "\ud83c\uddfa\ud83c\uddf8",
+  "Labor Day": "\ud83d\udee0\ufe0f",
+  "Columbus Day": "\u26f5",
+  "Thanksgiving Day": "\ud83e\udd83",
+  "Easter Sunday": "\ud83e\udd5a"
+};
+
+function updateWeatherTable() {
+    const select = document.getElementById('holidaySelect');
+    const selectedHoliday = select.value;
+    const tbody = document.getElementById('tableBody');
+    const header = document.getElementById('mainHeader');
+    
+    tbody.innerHTML = "";
+    
+    if (!selectedHoliday || !weatherDatabase[selectedHoliday]) {
+        header.innerHTML = "🌤️ Holiday Weather Dashboard Matrix";
+        tbody.innerHTML = '<tr><td colspan="4" class="no-data">Select an observance from the menu above to unpack historical climate trends.</td></tr>';
+        return;
+    }
+    
+    // Dynamically shift dashboard header title string to include match icon
+    const activeIcon = holidayIcons[selectedHoliday] || "📅";
+    header.innerHTML = `${activeIcon} ${selectedHoliday} Weather History`;
+    
+    const records = weatherDatabase[selectedHoliday];
+    
+    records.forEach(row => {
+        const tr = document.createElement('tr');
+        
+        const highDisp = row.high !== "N/A" ? `<span class="temp-badge temp-high">${row.high} °F</span>` : '<span class="text-muted">N/A</span>';
+        const lowDisp = row.low !== "N/A" ? `<span class="temp-badge temp-low">${row.low} °F</span>` : '<span class="text-muted">N/A</span>';
+        
+        let precipDisp = '<span class="text-muted">N/A</span>';
+        if (row.precip !== "N/A") {
+            const isTrace = row.precip.toUpperCase() === 'T';
+            precipDisp = `<span class="precip-badge">💧 ${row.precip}${isTrace ? '' : ' in'}</span>`;
+        }
+        
+        tr.innerHTML = `
+            <td><strong>${row.date}</strong></td>
+            <td>${highDisp}</td>
+            <td>${lowDisp}</td>
+            <td>${precipDisp}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+</script>
+
+</body>
+</html>
