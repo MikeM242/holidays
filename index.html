@@ -163,7 +163,7 @@
         <label for="holidaySelect">Select Holiday</label>
         <select id="holidaySelect" onchange="updateWeatherTable()">
             <option value="">-- Choose an Observance --</option>
-            <option value="Christmas Day">🎄 Christmas Day</option><option value="Columbus Day">⛵ Columbus Day</option><option value="Easter Sunday">🥚 Easter Sunday</option><option value="Halloween">🎃 Halloween</option><option value="Independence Day">🎆 Independence Day</option><option value="Juneteenth">✊🏾 Juneteenth</option><option value="Labor Day">🛠️ Labor Day</option><option value="Martin Luther King Jr. Day">🕊️ Martin Luther King Jr. Day</option><option value="Memorial Day">🇺🇸 Memorial Day</option><option value="New Year's Day">🥂 New Year's Day</option><option value="New Year's Eve">🎉 New Year's Eve</option><option value="Presidents' Day">🦅 Presidents' Day</option><option value="Thanksgiving Day">🦃 Thanksgiving Day</option><option value="Veterans Day">🎖️ Veterans Day</option>
+            <option value="Christmas Day">🎄 Christmas Day</option><option value="Christmas Eve">🎄 Christmas Eve</option><option value="Columbus Day">⛵ Columbus Day</option><option value="Easter Sunday">🥚 Easter Sunday</option><option value="Halloween">🎃 Halloween</option><option value="Independence Day">🎆 Independence Day</option><option value="Juneteenth">✊🏾 Juneteenth</option><option value="Labor Day">🛠️ Labor Day</option><option value="Martin Luther King Jr. Day">🕊️ Martin Luther King Jr. Day</option><option value="Memorial Day">🇺🇸 Memorial Day</option><option value="New Year's Day">🥂 New Year's Day</option><option value="New Year's Eve">🎉 New Year's Eve</option><option value="Presidents' Day">🦅 Presidents' Day</option><option value="Thanksgiving Day">🦃 Thanksgiving Day</option><option value="Veterans Day">🎖️ Veterans Day</option>
         </select>
     </div>
 
@@ -404,6 +404,50 @@ const weatherDatabase = {
       "high": "N/A",
       "low": "N/A",
       "precip": "N/A"
+    }
+  ],
+  "Christmas Eve": [
+    {
+      "date": "2026-12-24",
+      "high": "N/A",
+      "low": "N/A",
+      "precip": "N/A"
+    },
+    {
+      "date": "2025-12-24",
+      "high": "46.0",
+      "low": "31.6",
+      "precip": "0.00"
+    },
+    {
+      "date": "2024-12-24",
+      "high": "38.3",
+      "low": "28.0",
+      "precip": "0.0"
+    },
+    {
+      "date": "2023-12-24",
+      "high": "49.5",
+      "low": "39.4",
+      "precip": "0.04"
+    },
+    {
+      "date": "2022-12-24",
+      "high": "15.3",
+      "low": "7.2",
+      "precip": "0.0"
+    },
+    {
+      "date": "2021-12-24",
+      "high": "N/A",
+      "low": "N/A",
+      "precip": "N/A"
+    },
+    {
+      "date": "2020-12-24",
+      "high": "57.7",
+      "low": "36.5",
+      "precip": "0.06"
     }
   ],
   "Christmas Day": [
@@ -809,6 +853,7 @@ const holidayIcons = {
   "Independence Day": "\ud83c\udf86",
   "Halloween": "\ud83c\udf83",
   "Veterans Day": "\ud83c\udf96\ufe0f",
+  "Christmas Eve": "\ud83c\udf84",
   "Christmas Day": "\ud83c\udf84",
   "New Year's Eve": "\ud83c\udf89",
   "Martin Luther King Jr. Day": "\ud83d\udd4a\ufe0f",
